@@ -1,0 +1,7 @@
+C:\LabsC#\LabWork9\Praktika 9\GraphicShapesHierarchy\bin\Debug\GraphicShapesHierarchy.exe.config
+C:\LabsC#\LabWork9\Praktika 9\GraphicShapesHierarchy\bin\Debug\GraphicShapesHierarchy.exe
+C:\LabsC#\LabWork9\Praktika 9\GraphicShapesHierarchy\bin\Debug\GraphicShapesHierarchy.pdb
+C:\LabsC#\LabWork9\Praktika 9\GraphicShapesHierarchy\obj\Debug\GraphicShapesHierarchy.csproj.AssemblyReference.cache
+C:\LabsC#\LabWork9\Praktika 9\GraphicShapesHierarchy\obj\Debug\GraphicShapesHierarchy.csproj.CoreCompileInputs.cache
+C:\LabsC#\LabWork9\Praktika 9\GraphicShapesHierarchy\obj\Debug\GraphicShapesHierarchy.exe
+C:\LabsC#\LabWork9\Praktika 9\GraphicShapesHierarchy\obj\Debug\GraphicShapesHierarchy.pdb
