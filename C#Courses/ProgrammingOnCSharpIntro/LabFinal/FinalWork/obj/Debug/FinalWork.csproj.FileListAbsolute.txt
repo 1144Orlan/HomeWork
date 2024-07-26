@@ -1,7 +1,0 @@
-C:\LabsC#\LabWorkControl\FinalWork\obj\Debug\FinalWork.csproj.AssemblyReference.cache
-C:\LabsC#\LabWorkControl\FinalWork\obj\Debug\FinalWork.csproj.CoreCompileInputs.cache
-C:\LabsC#\LabWorkControl\FinalWork\bin\Debug\FinalWork.exe.config
-C:\LabsC#\LabWorkControl\FinalWork\bin\Debug\FinalWork.exe
-C:\LabsC#\LabWorkControl\FinalWork\bin\Debug\FinalWork.pdb
-C:\LabsC#\LabWorkControl\FinalWork\obj\Debug\FinalWork.exe
-C:\LabsC#\LabWorkControl\FinalWork\obj\Debug\FinalWork.pdb
