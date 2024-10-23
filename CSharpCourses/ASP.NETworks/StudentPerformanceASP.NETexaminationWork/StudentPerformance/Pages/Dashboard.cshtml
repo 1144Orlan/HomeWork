@@ -1,0 +1,28 @@
+﻿@page
+@model StudentPerformance.Pages.DashboardModel
+@{
+    ViewData["Title"] = "Доска успеваемости";
+}
+
+<h1>Доска успеваемости студентов</h1>
+
+<h2>Пятеро лучших!</h2>
+<ul>
+    @foreach (var student in Model.TopStudents)
+    {
+        <li>@student.Name - Total Points: @student.TotalPoints</li>
+    }
+</ul>
+
+<h2>Пятёрка аутсайдеров</h2>
+<ul>
+    @foreach (var student in Model.BottomStudents)
+    {
+        <li>@student.Name - Total Points: @student.TotalPoints</li>
+    }
+</ul>
+
+<form method="post">
+    <button type="submit" class="btn btn-primary">Export Results to Text File</button>
+</form>
+
