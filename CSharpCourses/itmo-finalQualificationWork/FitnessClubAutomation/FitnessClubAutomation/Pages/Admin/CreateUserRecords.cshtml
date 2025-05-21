@@ -1,0 +1,23 @@
+﻿@page
+@model FitnessClubAutomation.Pages.Admin.CreateUserRecordsModel
+@{
+    ViewData["Title"] = "Create User Records";
+}
+
+<h1>Create User Records</h1>
+
+<p>This page automatically creates Staff and Client records for users with corresponding roles.</p>
+
+<a asp-page="./CreateUserRecords" class="btn btn-primary mb-3">Run Again</a>
+
+<h2>Results</h2>
+<ul class="list-group">
+    @foreach (var result in Model.Results)
+    {
+        <li class="list-group-item">@result</li>
+    }
+</ul>
+
+<div class="mt-3">
+    <a asp-page="./UserRoles" class="btn btn-secondary">Back to User Roles</a>
+</div>

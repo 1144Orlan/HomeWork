@@ -1,0 +1,87 @@
+﻿@page
+@model FitnessClubAutomation.Pages.Dashboard.CoachDashboardModel
+@{
+    ViewData["Title"] = "Coach Dashboard";
+}
+
+<h1>Coach Dashboard</h1>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Your Training Schedule</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.TrainingSessions.Any())
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th>Date & Time</th>
+                                <th>Type</th>
+                                <th>Participants</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var session in Model.TrainingSessions)
+                            {
+                                <tr>
+                                    <td>@session.Service.Name</td>
+                                    <td>@session.DateTime.ToString("g")</td>
+                                    <td>@session.Service.Type</td>
+                                    <td>@session.CurrentParticipants / @(session.MaxParticipants.HasValue? session.MaxParticipants.Value.ToString() : "∞")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p>You have no upcoming training sessions.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Your Services</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.Services.Any())
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Duration</th>
+                                <th>Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var service in Model.Services)
+                            {
+                                <tr>
+                                    <td>@service.Name</td>
+                                    <td>@service.Type</td>
+                                    <td>@service.DurationMinutes min</td>
+                                    <td>@service.Cost.ToString("C")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p>You are not assigned to any services.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

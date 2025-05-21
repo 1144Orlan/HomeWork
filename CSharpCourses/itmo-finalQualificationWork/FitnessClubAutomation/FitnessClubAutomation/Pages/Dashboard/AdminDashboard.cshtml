@@ -1,0 +1,51 @@
+﻿@page
+@model FitnessClubAutomation.Pages.Dashboard.AdminDashboardModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<h1>Admin Dashboard</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Client Statistics</h5>
+            </div>
+            <div class="card-body">
+                <p>Total Clients: @Model.TotalClients</p>
+                <p>Permanent Clients: @Model.PermanentClients</p>
+                <p>One-time Clients: @Model.OneTimeClients</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Service Statistics</h5>
+            </div>
+            <div class="card-body">
+                <p>Total Services: @Model.TotalServices</p>
+                <p>Group Services: @Model.GroupServices</p>
+                <p>Individual Services: @Model.IndividualServices</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Quick Links</h5>
+            </div>
+            <div class="card-body">
+                <a asp-page="/Clients/Index" class="btn btn-primary m-2">Manage Clients</a>
+                <a asp-page="/Employees/Index" class="btn btn-success m-2">Manage Staff</a>
+                <a asp-page="/Services/Index" class="btn btn-info m-2">Manage Services</a>
+                <a asp-page="/TrainingSessions/Index" class="btn btn-warning m-2">Manage Training Sessions</a>
+            </div>
+        </div>
+    </div>
+</div>

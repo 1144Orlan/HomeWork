@@ -1,0 +1,98 @@
+﻿@page
+@model FitnessClubAutomation.Pages.Dashboard.ClientDashboardModel
+@{
+    ViewData["Title"] = "Client Dashboard";
+}
+
+<h1>Client Dashboard</h1>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Your Registered Services</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.ClientServices.Any())
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th>Type</th>
+                                <th>Coach</th>
+                                <th>Cost</th>
+                                <th>Registration Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var service in Model.ClientServices)
+                            {
+                                <tr>
+                                    <td>@service.Service.Name</td>
+                                    <td>@service.Service.Type</td>
+                                    <td>@service.Service.Coach.FullName</td>
+                                    <td>@service.Service.Cost.ToString("C")</td>
+                                    <td>@service.RegistrationDate.ToShortDateString()</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p>You are not registered for any services.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Available Services</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.AvailableServices.Any())
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Coach</th>
+                                <th>Duration</th>
+                                <th>Cost</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var service in Model.AvailableServices)
+                            {
+                                <tr>
+                                    <td>@service.Name</td>
+                                    <td>@service.Type</td>
+                                    <td>@service.Coach.FullName</td>
+                                    <td>@service.DurationMinutes min</td>
+                                    <td>@service.Cost.ToString("C")</td>
+                                    <td>
+                                        <form method="post">
+                                            <input type="hidden" name="serviceId" value="@service.Id" />
+                                            <button type="submit" class="btn btn-sm btn-primary">Register</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p>No available services found.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,38 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome to Fitness Club Automation System</h1>
+
+    @if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        @if (User.IsInRole("Admin"))
+        {
+            <p>Welcome, Administrator!</p>
+            <a asp-page="/Dashboard/AdminDashboard" class="btn btn-primary">Go to Admin Dashboard</a>
+        }
+        else if (User.IsInRole("Coach"))
+        {
+            <p>Welcome, Coach!</p>
+            <a asp-page="/Dashboard/CoachDashboard" class="btn btn-primary">Go to Coach Dashboard</a>
+        }
+        else if (User.IsInRole("Client"))
+        {
+            <p>Welcome, Client!</p>
+            <a asp-page="/Dashboard/ClientDashboard" class="btn btn-primary">Go to Client Dashboard</a>
+        }
+        else
+        {
+            <p>Your account has not been assigned a role yet. Please contact the administrator.</p>
+        }
+    }
+    else
+    {
+        <p>Please log in to access the system.</p>
+        <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary">Log in</a>
+        <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-secondary">Register</a>
+    }
+</div>

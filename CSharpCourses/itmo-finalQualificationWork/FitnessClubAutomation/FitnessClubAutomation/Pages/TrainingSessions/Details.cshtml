@@ -1,0 +1,43 @@
+﻿@page
+@model FitnessClubAutomation.Pages.TrainingSessions.DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>TrainingSession</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.TrainingSession.Service)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.TrainingSession.Service.Name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.TrainingSession.DateTime)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.TrainingSession.DateTime)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.TrainingSession.MaxParticipants)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.TrainingSession.MaxParticipants)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.TrainingSession.CurrentParticipants)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.TrainingSession.CurrentParticipants)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.TrainingSession.Id">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>
