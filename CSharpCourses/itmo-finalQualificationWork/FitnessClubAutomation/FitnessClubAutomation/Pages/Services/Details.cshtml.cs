@@ -30,7 +30,7 @@ namespace FitnessClubAutomation.Pages.Services
                 return NotFound();
             }
 
-            var service = await _context.Services.FirstOrDefaultAsync(m => m.Id == id);
+            var service = await _context.Services.Include(s => s.Coach).FirstOrDefaultAsync(m => m.Id == id);
             if (service == null)
             {
                 return NotFound();

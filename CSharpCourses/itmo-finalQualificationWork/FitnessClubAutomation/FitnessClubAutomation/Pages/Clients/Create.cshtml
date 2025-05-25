@@ -43,9 +43,19 @@
                 <span asp-validation-for="Client.Email" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label class="control-label">Account Password</label>
+                <div class="input-group">
+                    <input asp-for="Password" class="form-control" />
+                    <div class="input-group-append">
+                        <span class="input-group-text">Auto-generated</span>
+                    </div>
+                </div>
+                <small class="form-text text-muted">This password will be used for the client's login account</small>
+            </div>
+            <div class="form-group">
                 <span class="text-danger">*</span>
                 <label asp-for="Client.Status" class="control-label"></label>
-                <select asp-for="Client.Status" class="form-control"></select>
+                <select asp-for="Client.Status" class="form-control" asp-items="Html.GetEnumSelectList<FitnessClubAutomation.Models.ClientStatus>()"></select>
                 <span asp-validation-for="Client.Status" class="text-danger"></span>
             </div>
             <div class="form-group">

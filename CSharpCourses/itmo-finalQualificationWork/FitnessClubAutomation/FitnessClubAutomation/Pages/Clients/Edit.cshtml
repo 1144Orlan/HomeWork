@@ -46,7 +46,7 @@
             <div class="form-group">
                 <span class="text-danger">*</span>
                 <label asp-for="Client.Status" class="control-label"></label>
-                <select asp-for="Client.Status" class="form-control"></select>
+                <select asp-for="Client.Status" class="form-control" asp-items="Html.GetEnumSelectList<FitnessClubAutomation.Models.ClientStatus>()"></select>
                 <span asp-validation-for="Client.Status" class="text-danger"></span>
             </div>
             <div class="form-group">

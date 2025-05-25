@@ -20,8 +20,7 @@ namespace FitnessClubAutomation.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            // Configure relations
+                        
             modelBuilder.Entity<ClientService>()
                 .HasOne(cs => cs.Client)
                 .WithMany(c => c.ClientServices)
@@ -31,6 +30,12 @@ namespace FitnessClubAutomation.Data
                 .HasOne(cs => cs.Service)
                 .WithMany(s => s.ClientServices)
                 .HasForeignKey(cs => cs.ServiceId);
+                        
+            modelBuilder.Entity<ClientService>()
+                .HasOne(cs => cs.TrainingSession)
+                .WithMany()
+                .HasForeignKey(cs => cs.TrainingSessionId)
+                .IsRequired(false);
 
             modelBuilder.Entity<Service>()
                 .HasOne(s => s.Coach)

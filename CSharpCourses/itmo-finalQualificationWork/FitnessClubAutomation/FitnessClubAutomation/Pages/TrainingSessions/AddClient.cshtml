@@ -1,0 +1,36 @@
+﻿@page "{id:int}"
+@model FitnessClubAutomation.Pages.TrainingSessions.AddClientModel
+@{
+    ViewData["Title"] = "Add Client to Training Session";
+}
+
+<h1>Add Client to Training Session</h1>
+
+<h4>@Model.TrainingSession.Service.Name - @Model.TrainingSession.DateTime.ToString("dd-MM-yyyy HH:mm")</h4>
+
+<div asp-validation-summary="All" class="text-danger"></div>
+
+<div class="row">
+    <div class="col-md-6">
+        <form method="post">
+            <div class="form-group mb-3">
+                <label for="ClientId" class="control-label">Select Client</label>
+                <select asp-for="ClientId" class="form-control" asp-items="Model.AvailableClients">
+                    <option value="">-- Select a Client --</option>
+                </select>
+                <span asp-validation-for="ClientId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <input type="submit" value="Add Client" class="btn btn-primary" />
+                <a asp-page="./Details" asp-route-id="@Model.TrainingSession.Id" class="btn btn-secondary">Back to Details</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

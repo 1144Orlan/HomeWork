@@ -3,11 +3,7 @@ using FitnessClubAutomation.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace FitnessClubAutomation.Pages.Employees
@@ -15,15 +11,15 @@ namespace FitnessClubAutomation.Pages.Employees
     [Authorize(Roles = "Admin")]
     public class EditModel : PageModel
     {
-        private readonly FitnessClubAutomation.Data.ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public EditModel(FitnessClubAutomation.Data.ApplicationDbContext context)
+        public EditModel(ApplicationDbContext context)
         {
             _context = context;
         }
 
         [BindProperty]
-        public Staff Staff { get; set; } = default!;
+        public Models.Staff Staff { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -32,7 +28,7 @@ namespace FitnessClubAutomation.Pages.Employees
                 return NotFound();
             }
 
-            var staff =  await _context.Staff.FirstOrDefaultAsync(m => m.Id == id);
+            var staff = await _context.Staff.FirstOrDefaultAsync(m => m.Id == id);
             if (staff == null)
             {
                 return NotFound();
@@ -41,19 +37,28 @@ namespace FitnessClubAutomation.Pages.Employees
             return Page();
         }
 
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
-        {
+        {            
+            ModelState.Remove("Staff.Services");
+                        
+            foreach (var modelState in ModelState)
+            {
+                var key = modelState.Key;
+                var errors = modelState.Value.Errors;
+                foreach (var error in errors)
+                {                    
+                    System.Diagnostics.Debug.WriteLine($"Error in {key}: {error.ErrorMessage}");
+                }
+            }
+
             if (!ModelState.IsValid)
             {
                 return Page();
             }
 
-            _context.Attach(Staff).State = EntityState.Modified;
-
             try
             {
+                _context.Attach(Staff).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)

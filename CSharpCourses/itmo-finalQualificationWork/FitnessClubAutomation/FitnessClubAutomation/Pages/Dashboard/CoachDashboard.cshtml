@@ -22,6 +22,7 @@
                                 <th>Date & Time</th>
                                 <th>Type</th>
                                 <th>Participants</th>
+                                <th>Clients</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -29,9 +30,31 @@
                             {
                                 <tr>
                                     <td>@session.Service.Name</td>
-                                    <td>@session.DateTime.ToString("g")</td>
+                                    <td>@session.DateTime.ToString("dd-MM-yyyy HH:mm")</td>
                                     <td>@session.Service.Type</td>
                                     <td>@session.CurrentParticipants / @(session.MaxParticipants.HasValue? session.MaxParticipants.Value.ToString() : "∞")</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info" type="button" onclick="toggleClientList('@session.Id')">
+                                            Show Clients (@Model.SessionClients[session.Id].Count)
+                                        </button>
+                                        <div id="clients-@session.Id" style="display: none;" class="mt-2">
+                                            <div class="card card-body">
+                                                @if (Model.SessionClients[session.Id].Any())
+                                                {
+                                                    <ul class="list-group">
+                                                        @foreach (var client in Model.SessionClients[session.Id])
+                                                        {
+                                                            <li class="list-group-item">@client.FullName - @client.Email</li>
+                                                        }
+                                                    </ul>
+                                                }
+                                                else
+                                                {
+                                                    <p>No clients registered for this session.</p>
+                                                }
+                                            </div>
+                                        </div>
+                                    </td>
                                 </tr>
                             }
                         </tbody>
@@ -85,3 +108,16 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        function toggleClientList(sessionId) {
+            var clientList = document.getElementById('clients-' + sessionId);
+            if (clientList.style.display === 'none') {
+                clientList.style.display = 'block';
+            } else {
+                clientList.style.display = 'none';
+            }
+        }
+    </script>
+}

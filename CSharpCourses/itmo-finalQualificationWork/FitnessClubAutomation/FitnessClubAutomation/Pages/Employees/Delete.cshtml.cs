@@ -1,11 +1,10 @@
 ﻿using FitnessClubAutomation.Data;
 using FitnessClubAutomation.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,15 +13,23 @@ namespace FitnessClubAutomation.Pages.Employees
     [Authorize(Roles = "Admin")]
     public class DeleteModel : PageModel
     {
-        private readonly FitnessClubAutomation.Data.ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public DeleteModel(FitnessClubAutomation.Data.ApplicationDbContext context)
+        public DeleteModel(
+            ApplicationDbContext context,
+            UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         [BindProperty]
         public Staff Staff { get; set; } = default!;
+
+        public int ServicesCount { get; set; }
+        public int TrainingSessionsCount { get; set; }
+        public int ClientRegistrationsCount { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -40,7 +47,21 @@ namespace FitnessClubAutomation.Pages.Employees
             else
             {
                 Staff = staff;
+                
+                ServicesCount = await _context.Services.CountAsync(s => s.StaffId == id);
+
+                var serviceIds = await _context.Services
+                    .Where(s => s.StaffId == id)
+                    .Select(s => s.Id)
+                    .ToListAsync();
+
+                TrainingSessionsCount = await _context.TrainingSessions
+                    .CountAsync(t => serviceIds.Contains(t.ServiceId));
+
+                ClientRegistrationsCount = await _context.ClientServices
+                    .CountAsync(cs => serviceIds.Contains(cs.ServiceId));
             }
+
             return Page();
         }
 
@@ -51,12 +72,35 @@ namespace FitnessClubAutomation.Pages.Employees
                 return NotFound();
             }
 
-            var staff = await _context.Staff.FindAsync(id);
+            var staff = await _context.Staff
+                .Include(s => s.Services)
+                .ThenInclude(s => s.TrainingSessions)
+                .Include(s => s.Services)
+                .ThenInclude(s => s.ClientServices)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
             if (staff != null)
-            {
-                Staff = staff;
-                _context.Staff.Remove(Staff);
+            {                
+                foreach (var service in staff.Services)
+                {                    
+                    _context.ClientServices.RemoveRange(service.ClientServices);
+                                        
+                    _context.TrainingSessions.RemoveRange(service.TrainingSessions);
+                }
+                                
+                _context.Services.RemoveRange(staff.Services);
+                                
+                _context.Staff.Remove(staff);
+                                
+                var user = await _userManager.FindByEmailAsync(staff.Email);
+                if (user != null)
+                {
+                    await _userManager.DeleteAsync(user);
+                }
+
                 await _context.SaveChangesAsync();
+
+                TempData["Message"] = $"Staff member {staff.FullName} and all related data have been deleted";
             }
 
             return RedirectToPage("./Index");

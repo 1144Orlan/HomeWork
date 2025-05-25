@@ -1,9 +1,10 @@
-﻿using FitnessClubAutomation.Data;
+using FitnessClubAutomation.Data;
 using FitnessClubAutomation.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,12 +12,12 @@ using System.Threading.Tasks;
 namespace FitnessClubAutomation.Pages.Clients
 {
     [Authorize(Roles = "Admin")]
-    public class CreateModel : PageModel
+    public class ResetPasswordModel : PageModel
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
 
-        public CreateModel(
+        public ResetPasswordModel(
             ApplicationDbContext context,
             UserManager<IdentityUser> userManager)
         {
@@ -28,65 +29,68 @@ namespace FitnessClubAutomation.Pages.Clients
         public Client Client { get; set; } = default!;
 
         [BindProperty]
-        public string Password { get; set; } = string.Empty;
+        public string NewPassword { get; set; } = string.Empty;
 
-        public IActionResult OnGet()
+        public async Task<IActionResult> OnGetAsync(int? id)
         {
-            // Generate a client code and password
-            Client = new Client
+            if (id == null)
             {
-                ClientCode = "CL" + new Random().Next(1000, 9999).ToString()
-            };
+                return NotFound();
+            }
+
+            var client = await _context.Clients.FirstOrDefaultAsync(m => m.Id == id);
+            if (client == null)
+            {
+                return NotFound();
+            }
+
+            Client = client;
             
-            Password = GenerateRandomPassword();
+            NewPassword = GenerateRandomPassword();
 
             return Page();
         }
 
         private string GenerateRandomPassword()
-        {            
+        {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
             const string specialChars = "!@#$%^&*()";
 
             var random = new Random();
             var password = new string(Enumerable.Repeat(chars, 8)
                 .Select(s => s[random.Next(s.Length)]).ToArray());
-            
+
             password += specialChars[random.Next(specialChars.Length)];
 
             return password;
         }
 
         public async Task<IActionResult> OnPostAsync()
-        {            
-            ModelState.Remove("Client.ClientServices");
-
-            if (!ModelState.IsValid)
+        {
+            var client = await _context.Clients.FindAsync(Client.Id);
+            if (client == null)
             {
-                return Page();
+                return NotFound();
             }
-            
-            _context.Clients.Add(Client);
-            await _context.SaveChangesAsync();
-            
-            var user = new IdentityUser
+                        
+            var user = await _userManager.FindByEmailAsync(client.Email);
+            if (user == null)
             {
-                UserName = Client.Email,
-                Email = Client.Email,
-                EmailConfirmed = true
-            };
-
-            var result = await _userManager.CreateAsync(user, Password);
+                TempData["Message"] = $"No user account found for {client.Email}";
+                return RedirectToPage("./Index");
+            }
+                        
+            string resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, resetToken, NewPassword);
 
             if (result.Succeeded)
-            {                
-                await _userManager.AddToRoleAsync(user, "Client");
-                TempData["Message"] = $"Client created successfully with account {Client.Email} and password {Password}";
+            {
+                TempData["Message"] = $"Password for {client.Email} has been reset to: {NewPassword}";
             }
             else
-            {                
+            {
                 string errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                TempData["Message"] = $"Client record created, but could not create user account: {errors}";
+                TempData["Message"] = $"Failed to reset password: {errors}";
             }
 
             return RedirectToPage("./Index");

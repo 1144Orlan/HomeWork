@@ -9,6 +9,25 @@
 
 <h4>Staff</h4>
 <hr />
+
+@if (TempData["ValidationFailed"] != null)
+{
+    <div class="alert alert-danger">
+        <p>@TempData["ValidationFailed"]</p>
+        @foreach (var key in TempData.Keys.Where(k => k.StartsWith("Error_")))
+        {
+            <p>@key: @TempData[key]</p>
+        }
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        <p>@TempData["Error"]</p>
+    </div>
+}
+
 <div class="row">
     <div class="col-md-4">
         <form method="post">
@@ -22,8 +41,9 @@
             <div class="form-group">
                 <span class="text-danger">*</span>
                 <label asp-for="Staff.Position" class="control-label"></label>
-                <input asp-for="Staff.Position" class="form-control" />
+                <input asp-for="Staff.Position" class="form-control" readonly />
                 <span asp-validation-for="Staff.Position" class="text-danger"></span>
+                <small class="form-text text-muted">Position is set to "Coach" by default</small>
             </div>
             <div class="form-group">
                 <span class="text-danger">*</span>
@@ -38,6 +58,16 @@
                 <span asp-validation-for="Staff.Email" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label class="control-label">Account Password</label>
+                <div class="input-group">
+                    <input asp-for="Password" class="form-control" />
+                    <div class="input-group-append">
+                        <span class="input-group-text">Auto-generated</span>
+                    </div>
+                </div>
+                <small class="form-text text-muted">This password will be used for the coach's login account</small>
+            </div>
+            <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>
@@ -49,5 +79,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

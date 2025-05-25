@@ -5,6 +5,8 @@ VisualStudioVersion = 17.14.36109.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FitnessClubAutomation", "FitnessClubAutomation\FitnessClubAutomation.csproj", "{8DB3E025-1EC7-42C6-958C-34386ADB8842}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FitnessClubAutomation.Tests", "FitnessClubAutomation.Tests\FitnessClubAutomation.Tests.csproj", "{CB219C61-BA9F-41CC-AE38-8A4AE59E9EC5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{8DB3E025-1EC7-42C6-958C-34386ADB8842}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8DB3E025-1EC7-42C6-958C-34386ADB8842}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8DB3E025-1EC7-42C6-958C-34386ADB8842}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CB219C61-BA9F-41CC-AE38-8A4AE59E9EC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB219C61-BA9F-41CC-AE38-8A4AE59E9EC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CB219C61-BA9F-41CC-AE38-8A4AE59E9EC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CB219C61-BA9F-41CC-AE38-8A4AE59E9EC5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

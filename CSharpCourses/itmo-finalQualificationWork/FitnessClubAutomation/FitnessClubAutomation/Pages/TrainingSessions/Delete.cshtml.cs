@@ -51,11 +51,22 @@ namespace FitnessClubAutomation.Pages.TrainingSessions
                 return NotFound();
             }
 
-            var trainingsession = await _context.TrainingSessions.FindAsync(id);
-            if (trainingsession != null)
-            {
-                TrainingSession = trainingsession;
-                _context.TrainingSessions.Remove(TrainingSession);
+            var trainingSession = await _context.TrainingSessions
+                .Include(t => t.Service)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (trainingSession != null)
+            {                
+                var clientServices = await _context.ClientServices
+                    .Where(cs => cs.TrainingSessionId == trainingSession.Id)
+                    .ToListAsync();
+
+                if (clientServices.Any())
+                {
+                    _context.ClientServices.RemoveRange(clientServices);
+                }
+
+                _context.TrainingSessions.Remove(trainingSession);
                 await _context.SaveChangesAsync();
             }
 

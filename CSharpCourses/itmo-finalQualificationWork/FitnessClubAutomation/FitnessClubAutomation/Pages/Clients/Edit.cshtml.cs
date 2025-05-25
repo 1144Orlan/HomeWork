@@ -3,11 +3,7 @@ using FitnessClubAutomation.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace FitnessClubAutomation.Pages.Clients
@@ -15,9 +11,9 @@ namespace FitnessClubAutomation.Pages.Clients
     [Authorize(Roles = "Admin")]
     public class EditModel : PageModel
     {
-        private readonly FitnessClubAutomation.Data.ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public EditModel(FitnessClubAutomation.Data.ApplicationDbContext context)
+        public EditModel(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -32,7 +28,7 @@ namespace FitnessClubAutomation.Pages.Clients
                 return NotFound();
             }
 
-            var client =  await _context.Clients.FirstOrDefaultAsync(m => m.Id == id);
+            var client = await _context.Clients.FirstOrDefaultAsync(m => m.Id == id);
             if (client == null)
             {
                 return NotFound();
@@ -41,19 +37,29 @@ namespace FitnessClubAutomation.Pages.Clients
             return Page();
         }
 
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
-        {
+        {            
+            ModelState.Remove("Client.ClientServices");
+
+            // Debug info
+            foreach (var modelState in ModelState)
+            {
+                var key = modelState.Key;
+                var errors = modelState.Value.Errors;
+                foreach (var error in errors)
+                {                    
+                    System.Diagnostics.Debug.WriteLine($"Error in {key}: {error.ErrorMessage}");
+                }
+            }
+
             if (!ModelState.IsValid)
             {
                 return Page();
             }
 
-            _context.Attach(Client).State = EntityState.Modified;
-
             try
             {
+                _context.Attach(Client).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)

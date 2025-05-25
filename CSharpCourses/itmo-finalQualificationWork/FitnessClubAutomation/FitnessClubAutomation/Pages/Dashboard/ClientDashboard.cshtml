@@ -6,6 +6,18 @@
 
 <h1>Client Dashboard</h1>
 
+@if (!ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <ul>
+            @foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
+
 <div class="row">
     <div class="col-md-12">
         <div class="card mb-4">
@@ -21,6 +33,7 @@
                                 <th>Service</th>
                                 <th>Type</th>
                                 <th>Coach</th>
+                                <th>Session Date & Time</th>
                                 <th>Cost</th>
                                 <th>Registration Date</th>
                             </tr>
@@ -32,6 +45,16 @@
                                     <td>@service.Service.Name</td>
                                     <td>@service.Service.Type</td>
                                     <td>@service.Service.Coach.FullName</td>
+                                    <td>
+                                        @if (service.TrainingSession != null)
+                                        {
+                                            @service.TrainingSession.DateTime.ToString("dd-MM-yyyy HH:mm")
+                                        }
+                                        else
+                                        {
+                                            <span>No specific session</span>
+                                        }
+                                    </td>
                                     <td>@service.Service.Cost.ToString("C")</td>
                                     <td>@service.RegistrationDate.ToShortDateString()</td>
                                 </tr>
@@ -50,9 +73,70 @@
 
 <div class="row">
     <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Available Training Sessions</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.AvailableTrainingSessions.Any())
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th>Type</th>
+                                <th>Coach</th>
+                                <th>Date & Time</th>
+                                <th>Availability</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var session in Model.AvailableTrainingSessions)
+                            {
+                                <tr>
+                                    <td>@session.Service.Name</td>
+                                    <td>@session.Service.Type</td>
+                                    <td>@session.Service.Coach.FullName</td>
+                                    <td>@session.DateTime.ToString("dd-MM-yyyy HH:mm")</td>
+                                    <td>
+                                        @if (session.MaxParticipants.HasValue)
+                                        {
+                                            @session.CurrentParticipants
+                                            <text>/</text>
+                                            @session.MaxParticipants
+                                        }
+                                        else
+                                        {
+                                            @session.CurrentParticipants
+                                            <text>/∞</text>
+                                        }
+                                    </td>
+                                    <td>
+                                        <form method="post" asp-page-handler="RegisterForSession">
+                                            <input type="hidden" name="trainingSessionId" value="@session.Id" />
+                                            <button type="submit" class="btn btn-sm btn-primary">Register</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p>No available training sessions found.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
         <div class="card">
             <div class="card-header">
-                <h5>Available Services</h5>
+                <h5>Available Services Information</h5>
             </div>
             <div class="card-body">
                 @if (Model.AvailableServices.Any())
@@ -65,7 +149,6 @@
                                 <th>Coach</th>
                                 <th>Duration</th>
                                 <th>Cost</th>
-                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -77,12 +160,6 @@
                                     <td>@service.Coach.FullName</td>
                                     <td>@service.DurationMinutes min</td>
                                     <td>@service.Cost.ToString("C")</td>
-                                    <td>
-                                        <form method="post">
-                                            <input type="hidden" name="serviceId" value="@service.Id" />
-                                            <button type="submit" class="btn btn-sm btn-primary">Register</button>
-                                        </form>
-                                    </td>
                                 </tr>
                             }
                         </tbody>

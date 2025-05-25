@@ -1,43 +1,75 @@
-﻿@page
+﻿@page "{id:int}"
 @model FitnessClubAutomation.Pages.TrainingSessions.DetailsModel
-
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Training Session Details";
 }
 
-<h1>Details</h1>
+<h1>Training Session Details</h1>
 
 <div>
-    <h4>TrainingSession</h4>
-    <hr />
     <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TrainingSession.Service)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.TrainingSession.Service.Name)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TrainingSession.DateTime)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.TrainingSession.DateTime)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TrainingSession.MaxParticipants)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.TrainingSession.MaxParticipants)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TrainingSession.CurrentParticipants)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.TrainingSession.CurrentParticipants)
-        </dd>
+        <dt class="col-sm-3">Service</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.TrainingSession.Service.Name)</dd>
+
+        <dt class="col-sm-3">Type</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.TrainingSession.Service.Type)</dd>
+
+        <dt class="col-sm-3">Coach</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.TrainingSession.Service.Coach.FullName)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.TrainingSession.DateTime)</dt>
+        <dd class="col-sm-9">@Model.TrainingSession.DateTime.ToString("dd-MM-yyyy HH:mm")</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.TrainingSession.CurrentParticipants)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.TrainingSession.CurrentParticipants)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.TrainingSession.MaxParticipants)</dt>
+        <dd class="col-sm-9">@(Model.TrainingSession.MaxParticipants.HasValue? Model.TrainingSession.MaxParticipants.Value.ToString() : "Unlimited")</dd>
     </dl>
 </div>
+
+<h3>Registered Clients</h3>
+<p>
+    <a asp-page="./AddClient" asp-route-id="@Model.TrainingSession.Id" class="btn btn-success">Add Client</a>
+</p>
+
+@if (Model.RegisteredClients.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var client in Model.RegisteredClients)
+            {
+                <tr>
+                    <td>@client.FullName</td>
+                    <td>@client.Email</td>
+                    <td>@client.PhoneNumber</td>
+                    <td>@client.Status</td>
+                    <td>
+                        <form method="post" asp-page-handler="RemoveClient">
+                            <input type="hidden" name="clientId" value="@client.Id" />
+                            <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No clients are registered for this training session.</p>
+}
+
 <div>
-    <a asp-page="./Edit" asp-route-id="@Model.TrainingSession.Id">Edit</a> |
-    <a asp-page="./Index">Back to List</a>
+    <a asp-page="./Edit" asp-route-id="@Model.TrainingSession.Id" class="btn btn-primary">Edit</a>
+    <a asp-page="./Index" class="btn btn-secondary">Back to List</a>
 </div>
