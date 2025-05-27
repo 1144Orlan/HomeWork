@@ -31,44 +31,55 @@ namespace FitnessClubAutomation.Pages.Clients
         public string Password { get; set; } = string.Empty;
 
         public IActionResult OnGet()
-        {
-            // Generate a client code and password
+        {            
             Client = new Client
             {
                 ClientCode = "CL" + new Random().Next(1000, 9999).ToString()
             };
-            
+
             Password = GenerateRandomPassword();
 
             return Page();
         }
 
         private string GenerateRandomPassword()
-        {            
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        {
+            const string uppercaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const string lowercaseLetters = "abcdefghijklmnopqrstuvwxyz";
+            const string digits = "0123456789";
             const string specialChars = "!@#$%^&*()";
 
             var random = new Random();
-            var password = new string(Enumerable.Repeat(chars, 8)
+                        
+            var password = new string(Enumerable.Repeat(uppercaseLetters, 1)
                 .Select(s => s[random.Next(s.Length)]).ToArray());
-            
+                        
+            password += new string(Enumerable.Repeat(lowercaseLetters, 1)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+                        
+            password += new string(Enumerable.Repeat(uppercaseLetters + lowercaseLetters, 4)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+                        
+            password += new string(Enumerable.Repeat(digits, 2)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+                        
             password += specialChars[random.Next(specialChars.Length)];
 
             return password;
         }
 
         public async Task<IActionResult> OnPostAsync()
-        {            
+        {
             ModelState.Remove("Client.ClientServices");
 
             if (!ModelState.IsValid)
             {
                 return Page();
             }
-            
+
             _context.Clients.Add(Client);
             await _context.SaveChangesAsync();
-            
+
             var user = new IdentityUser
             {
                 UserName = Client.Email,
@@ -79,12 +90,12 @@ namespace FitnessClubAutomation.Pages.Clients
             var result = await _userManager.CreateAsync(user, Password);
 
             if (result.Succeeded)
-            {                
+            {
                 await _userManager.AddToRoleAsync(user, "Client");
                 TempData["Message"] = $"Client created successfully with account {Client.Email} and password {Password}";
             }
             else
-            {                
+            {
                 string errors = string.Join(", ", result.Errors.Select(e => e.Description));
                 TempData["Message"] = $"Client record created, but could not create user account: {errors}";
             }

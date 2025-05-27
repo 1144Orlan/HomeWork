@@ -1,3 +1,4 @@
+using FitnessClubAutomation.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace FitnessClubAutomation.Pages.Admin
@@ -15,14 +17,16 @@ namespace FitnessClubAutomation.Pages.Admin
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ApplicationDbContext _context;
 
         public UserRolesModel(
             UserManager<IdentityUser> userManager,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager,
+            ApplicationDbContext context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
-            // Initialize collections to avoid null reference warnings
+            _context = context;            
             Users = new List<UserRoleViewModel>();
             Input = new InputModel();
         }
@@ -52,27 +56,70 @@ namespace FitnessClubAutomation.Pages.Admin
         public SelectList? UserList { get; set; }
         public SelectList? RoleList { get; set; }
 
+        [TempData]
+        public string StatusMessage { get; set; } = string.Empty;
+
         public async Task OnGetAsync()
         {
             Users = new List<UserRoleViewModel>();
             var users = await _userManager.Users.ToListAsync();
+                        
+            var clients = await _context.Clients.ToListAsync();
+            var staff = await _context.Staff.ToListAsync();
 
             foreach (var user in users)
             {
                 if (user != null)
                 {
                     var userRoles = await _userManager.GetRolesAsync(user);
+                    
+                    string displayName = user.UserName ?? string.Empty;
+                    
+                    var client = clients.FirstOrDefault(c => c.Email == user.Email);
+                    if (client != null && !string.IsNullOrEmpty(client.FullName))
+                    {
+                        displayName = client.FullName;
+                    }
+                    else
+                    {                        
+                        var staffMember = staff.FirstOrDefault(s => s.Email == user.Email);
+                        if (staffMember != null && !string.IsNullOrEmpty(staffMember.FullName))
+                        {
+                            displayName = staffMember.FullName;
+                        }
+                    }
+
                     Users.Add(new UserRoleViewModel
                     {
                         UserId = user.Id,
-                        UserName = user.UserName ?? string.Empty,
+                        UserName = displayName,
                         Email = user.Email ?? string.Empty,
                         Roles = userRoles.ToList()
                     });
                 }
             }
+            
+            var userSelectList = users.Select(u => {
+                string displayName = u.UserName ?? string.Empty;
+                                
+                var client = clients.FirstOrDefault(c => c.Email == u.Email);
+                if (client != null && !string.IsNullOrEmpty(client.FullName))
+                {
+                    displayName = client.FullName;
+                }
+                else
+                {                    
+                    var staffMember = staff.FirstOrDefault(s => s.Email == u.Email);
+                    if (staffMember != null && !string.IsNullOrEmpty(staffMember.FullName))
+                    {
+                        displayName = staffMember.FullName;
+                    }
+                }
 
-            UserList = new SelectList(users, "Id", "Email");
+                return new { Id = u.Id, DisplayName = $"{displayName} ({u.Email})" };
+            });
+
+            UserList = new SelectList(userSelectList, "Id", "DisplayName");
             RoleList = new SelectList(await _roleManager.Roles.ToListAsync(), "Name", "Name");
         }
 
@@ -134,6 +181,60 @@ namespace FitnessClubAutomation.Pages.Admin
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
+            }
+
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostDeleteUserAsync(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest();
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+                        
+            if (!string.IsNullOrEmpty(user.Email))
+            {
+                var client = await _context.Clients.FirstOrDefaultAsync(c => c.Email == user.Email);
+                if (client != null)
+                {                    
+                    var clientServices = await _context.ClientServices
+                        .Where(cs => cs.ClientId == client.Id)
+                        .ToListAsync();
+
+                    if (clientServices.Any())
+                    {
+                        _context.ClientServices.RemoveRange(clientServices);
+                    }
+                                        
+                    _context.Clients.Remove(client);
+                    await _context.SaveChangesAsync();
+                    StatusMessage = "Client record deleted. ";
+                }
+                                
+                var staff = await _context.Staff.FirstOrDefaultAsync(s => s.Email == user.Email);
+                if (staff != null)
+                {                    
+                    _context.Staff.Remove(staff);
+                    await _context.SaveChangesAsync();
+                    StatusMessage += "Staff record deleted. ";
+                }
+            }
+                        
+            var result = await _userManager.DeleteAsync(user);
+            if (result.Succeeded)
+            {
+                StatusMessage += $"User account {user.Email} has been deleted.";
+            }
+            else
+            {
+                StatusMessage += $"Error deleting user account: {string.Join(", ", result.Errors.Select(e => e.Description))}";
             }
 
             return RedirectToPage();

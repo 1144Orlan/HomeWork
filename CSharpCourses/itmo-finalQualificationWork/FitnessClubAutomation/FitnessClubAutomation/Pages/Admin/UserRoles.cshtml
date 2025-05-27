@@ -6,6 +6,13 @@
 
 <h1>User Roles</h1>
 
+@if (!string.IsNullOrEmpty(Model.StatusMessage))
+{
+    <div class="alert alert-info">
+        @Model.StatusMessage
+    </div>
+}
+
 <div class="row">
     <div class="col-md-6">
         <div class="card mb-4">
@@ -15,19 +22,19 @@
             <div class="card-body">
                 <form method="post" asp-page-handler="AddToRole">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    
+
                     <div class="form-group mb-3">
                         <label asp-for="Input.UserId">User</label>
                         <select asp-for="Input.UserId" class="form-control" asp-items="Model.UserList"></select>
                         <span asp-validation-for="Input.UserId" class="text-danger"></span>
                     </div>
-                    
+
                     <div class="form-group mb-3">
                         <label asp-for="Input.RoleName">Role</label>
                         <select asp-for="Input.RoleName" class="form-control" asp-items="Model.RoleList"></select>
                         <span asp-validation-for="Input.RoleName" class="text-danger"></span>
                     </div>
-                    
+
                     <button type="submit" class="btn btn-primary">Assign Role</button>
                 </form>
             </div>
@@ -39,6 +46,7 @@
 <table class="table">
     <thead>
         <tr>
+            <th>User</th>
             <th>Email</th>
             <th>Roles</th>
             <th>Actions</th>
@@ -48,6 +56,7 @@
         @foreach (var user in Model.Users)
         {
             <tr>
+                <td>@user.UserName</td>
                 <td>@user.Email</td>
                 <td>
                     @string.Join(", ", user.Roles)
@@ -61,6 +70,10 @@
                             <button type="submit" class="btn btn-sm btn-danger">Remove from @role</button>
                         </form>
                     }
+                    <form method="post" asp-page-handler="DeleteUser" style="display: inline;">
+                        <input type="hidden" name="userId" value="@user.UserId" />
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this user?');">Delete User</button>
+                    </form>
                 </td>
             </tr>
         }
@@ -72,5 +85,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

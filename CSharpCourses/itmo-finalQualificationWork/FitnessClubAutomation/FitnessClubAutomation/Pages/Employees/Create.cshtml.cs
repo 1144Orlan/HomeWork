@@ -31,12 +31,12 @@ namespace FitnessClubAutomation.Pages.Employees
         public string Password { get; set; } = string.Empty;
 
         public IActionResult OnGet()
-        {            
+        {
             Staff = new Staff
             {
-                Position = "Coach" 
+                Position = "Coach"
             };
-                        
+
             Password = GenerateRandomPassword();
 
             return Page();
@@ -44,20 +44,32 @@ namespace FitnessClubAutomation.Pages.Employees
 
         private string GenerateRandomPassword()
         {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            const string uppercaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const string lowercaseLetters = "abcdefghijklmnopqrstuvwxyz";
+            const string digits = "0123456789";
             const string specialChars = "!@#$%^&*()";
 
             var random = new Random();
-            var password = new string(Enumerable.Repeat(chars, 8)
+                        
+            var password = new string(Enumerable.Repeat(uppercaseLetters, 1)
                 .Select(s => s[random.Next(s.Length)]).ToArray());
-
+            
+            password += new string(Enumerable.Repeat(lowercaseLetters, 1)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+                        
+            password += new string(Enumerable.Repeat(uppercaseLetters + lowercaseLetters, 4)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+                        
+            password += new string(Enumerable.Repeat(digits, 2)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+                        
             password += specialChars[random.Next(specialChars.Length)];
 
             return password;
         }
 
         public async Task<IActionResult> OnPostAsync()
-        {           
+        {
             ModelState.Remove("Staff.Services");
 
             if (!ModelState.IsValid)
@@ -66,10 +78,10 @@ namespace FitnessClubAutomation.Pages.Employees
             }
 
             try
-            {                
+            {
                 _context.Staff.Add(Staff);
                 await _context.SaveChangesAsync();
-                                
+
                 var user = new IdentityUser
                 {
                     UserName = Staff.Email,
@@ -80,7 +92,7 @@ namespace FitnessClubAutomation.Pages.Employees
                 var result = await _userManager.CreateAsync(user, Password);
 
                 if (result.Succeeded)
-                {                    
+                {
                     await _userManager.AddToRoleAsync(user, "Coach");
                     TempData["Message"] = $"Staff member created successfully with account {Staff.Email} and password {Password}";
                 }
@@ -93,7 +105,7 @@ namespace FitnessClubAutomation.Pages.Employees
                 return RedirectToPage("./Index");
             }
             catch (Exception ex)
-            {                
+            {
                 TempData["Error"] = $"Exception: {ex.Message}";
                 return Page();
             }

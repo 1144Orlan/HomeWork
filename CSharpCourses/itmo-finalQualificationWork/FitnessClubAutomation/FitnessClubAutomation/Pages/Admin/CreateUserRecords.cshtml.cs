@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -30,15 +31,15 @@ namespace FitnessClubAutomation.Pages.Admin
         public async Task<IActionResult> OnGetAsync()
         {
             Results = new List<string>();
-                        
+
             var coachUsers = await _userManager.GetUsersInRoleAsync("Coach");
             foreach (var user in coachUsers)
-            {                
+            {
                 var existingStaff = await _context.Staff
                     .FirstOrDefaultAsync(s => s.Email == user.Email);
 
                 if (existingStaff == null)
-                {                    
+                {
                     var staff = new Models.Staff
                     {
                         FullName = user.UserName ?? user.Email?.Split('@')[0] ?? "Coach",
@@ -55,21 +56,21 @@ namespace FitnessClubAutomation.Pages.Admin
                     Results.Add($"Staff record already exists for {user.Email}");
                 }
             }
-            
+
             var clientUsers = await _userManager.GetUsersInRoleAsync("Client");
             foreach (var user in clientUsers)
-            {                
+            {
                 var existingClient = await _context.Clients
                     .FirstOrDefaultAsync(c => c.Email == user.Email);
 
                 if (existingClient == null)
-                {                    
+                {
                     var client = new Client
                     {
                         FullName = user.UserName ?? user.Email?.Split('@')[0] ?? "Client",
                         Email = user.Email ?? "",
                         PhoneNumber = user.PhoneNumber ?? "",
-                        ClientCode = "CL" + new Random().Next(1000, 9999),
+                        ClientCode = "CL" + Guid.NewGuid().ToString().Substring(0, 6),
                         Status = ClientStatus.Permanent,
                         Address = "Default Address"
                     };
